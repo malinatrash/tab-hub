@@ -3,6 +3,7 @@ package create
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/malinatrash/tabhub/pkg/xml"
 	"log/slog"
 	"net/http"
@@ -13,6 +14,7 @@ type request struct {
 	Name    string `json:"name" validate:"required"`
 	OwnerID int    `json:"owner_id" validate:"required"`
 	State   []byte `json:"state,omitempty"`
+	Private bool   `json:"private"`
 }
 
 type response struct {
@@ -21,8 +23,7 @@ type response struct {
 }
 
 type ProjectManager interface {
-	CreateProject(ctx context.Context, name string, ownerID int, state []byte) error
-	GetProjectId(ctx context.Context, name string, ownerId int) (*int, error)
+	CreateProject(ctx context.Context, name string, ownerID int, state []byte, private bool) (*int, error)
 }
 
 func Handler(log *slog.Logger, manager ProjectManager) http.HandlerFunc {
@@ -38,16 +39,11 @@ func Handler(log *slog.Logger, manager ProjectManager) http.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		if err := manager.CreateProject(ctx, project.Name, project.OwnerID, project.State); err != nil {
-			http.Error(w, "Failed to create project", http.StatusInternalServerError)
-			log.Error("Error creating project: %v", err)
-			return
-		}
-
-		id, err := manager.GetProjectId(ctx, project.Name, project.OwnerID)
+		id, err := manager.CreateProject(ctx, project.Name, project.OwnerID, project.State, project.Private)
 		if err != nil {
-			log.Error("Project does not exist: %v", err)
-			http.Error(w, "Project not found", http.StatusInternalServerError)
+			errorDescription := fmt.Sprintf("Failed to create project: %s", err.Error())
+			http.Error(w, errorDescription, http.StatusInternalServerError)
+			log.Error(errorDescription)
 			return
 		}
 
