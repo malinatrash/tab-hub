@@ -27,6 +27,7 @@ func main() {
 	_ = storage
 
 	router := chi.NewRouter()
+
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
@@ -42,6 +43,7 @@ func main() {
 	})
 
 	log.Info("Server starting!")
+	log.Info("ENV:", cfg)
 	if err = http.ListenAndServe(cfg.Server.Address, router); err != nil {
 		log.Error(err.Error())
 	}

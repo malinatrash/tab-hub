@@ -10,7 +10,8 @@ import (
 
 func (s *Storage) User(ctx context.Context, username string, passwordHash string) (*int, error) {
 	var id int
-	err := s.db.QueryRowContext(ctx, `SELECT id FROM users WHERE username = $1 and password_hash = $2`, username, passwordHash).Scan(&id)
+	query := `SELECT id FROM users WHERE username = $1 and password_hash = $2`
+	err := s.db.GetContext(ctx, &id, query, username, passwordHash)
 	if err != nil {
 		return nil, err
 	}
@@ -20,11 +21,12 @@ func (s *Storage) User(ctx context.Context, username string, passwordHash string
 
 func (s *Storage) CreateUser(ctx context.Context, username string, passwordHash string) error {
 	var existingID int
-	err := s.db.QueryRowContext(ctx, `SELECT id FROM users WHERE username = $1`, username).Scan(&existingID)
+	query := `SELECT id FROM users WHERE username = $1`
+	err := s.db.GetContext(ctx, &existingID, query, username)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return fmt.Errorf("%w: %v", myErrors.ErrDBInsert, err)
 	}
-	if err == nil {
+	if existingID != 0 {
 		return fmt.Errorf("%w: %s", myErrors.ErrUserAlreadyExists, username)
 	}
 

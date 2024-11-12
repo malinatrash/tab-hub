@@ -1,8 +1,9 @@
 package models
 
 type Project struct {
-	Name    string
-	OwnerID int
-	State   []byte
-	Private bool
+	ID      int    `db:"id"`
+	Name    string `db:"name"`
+	OwnerID int    `db:"owner_id"`
+	State   []byte `db:"state"`
+	Private bool   `db:"private"`
 }
