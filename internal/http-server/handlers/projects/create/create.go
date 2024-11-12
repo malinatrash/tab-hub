@@ -13,7 +13,7 @@ import (
 type request struct {
 	Name    string `json:"name" validate:"required"`
 	OwnerID int    `json:"owner_id" validate:"required"`
-	State   []byte `json:"state,omitempty"`
+	State   string `json:"state,omitempty"`
 	Private bool   `json:"private"`
 }
 
@@ -23,7 +23,7 @@ type response struct {
 }
 
 type ProjectManager interface {
-	CreateProject(ctx context.Context, name string, ownerID int, state []byte, private bool) (*int, error)
+	CreateProject(ctx context.Context, name string, ownerID int, state string, private bool) (*int, error)
 }
 
 func Handler(log *slog.Logger, manager ProjectManager) http.HandlerFunc {
@@ -34,7 +34,7 @@ func Handler(log *slog.Logger, manager ProjectManager) http.HandlerFunc {
 			return
 		}
 
-		project.State = xml.GenerateEmptyMusicXML()
+		project.State = xml.GenerateProjectXML(project.Name)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()

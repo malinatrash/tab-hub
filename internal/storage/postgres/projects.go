@@ -6,7 +6,7 @@ import (
 	"github.com/malinatrash/tabhub/internal/storage/models"
 )
 
-func (s *Storage) CreateProject(ctx context.Context, name string, ownerID int, state []byte, private bool) (*int, error) {
+func (s *Storage) CreateProject(ctx context.Context, name string, ownerID int, state string, private bool) (*int, error) {
 	var id int
 	query := `INSERT INTO projects (name, owner_id, state, private, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING id`
 	err := s.db.GetContext(ctx, &id, query, name, ownerID, state, private)

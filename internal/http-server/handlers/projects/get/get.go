@@ -13,7 +13,7 @@ import (
 type response struct {
 	Name    string `json:"name" validate:"required"`
 	OwnerID int    `json:"owner_id" validate:"required"`
-	State   []byte `json:"state,omitempty"`
+	State   string `json:"state,omitempty"`
 }
 
 type ProjectManager interface {
