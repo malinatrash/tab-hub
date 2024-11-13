@@ -3,6 +3,7 @@ package get
 import (
 	"context"
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"github.com/malinatrash/tabhub/internal/storage/models"
 	"log/slog"
 	"net/http"
@@ -23,7 +24,7 @@ type ProjectManager interface {
 func Handler(log *slog.Logger, manager ProjectManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		idParam := r.URL.Query().Get("id")
+		idParam := chi.URLParam(r, "id")
 		if idParam == "" {
 			http.Error(w, "Missing project ID", http.StatusBadRequest)
 			return
