@@ -13,6 +13,7 @@ import (
 	wsManager "github.com/malinatrash/tabhub/internal/http-server/web-sockets/connection-handler"
 	"github.com/malinatrash/tabhub/internal/lib/logger"
 	"github.com/malinatrash/tabhub/internal/storage/postgres"
+	"github.com/malinatrash/tabhub/internal/storage/redis"
 
 	"net/http"
 	"os"
@@ -30,6 +31,12 @@ func main() {
 	}
 	_ = storage
 
+	redisClient, err := redis.New(cfg.Cache)
+	if err != nil {
+		log.Error("failed to initialize redisClient", err.Error())
+	}
+	_ = redisClient
+
 	router := chi.NewRouter()
 
 	router.Use(middleware.RequestID)
@@ -38,9 +45,12 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	router.Route("/projects", func(r chi.Router) {
+
 		r.Post("/", projectsCreate.Handler(log, storage))
 		r.Get("/{id}", projectsGet.Handler(log, storage))
-		r.Get("/{id}/ws", wsManager.Handler(log))
+
+		r.Get("/{id}/ws", wsManager.Handler(log, redisClient, storage))
+
 		r.Route("/permissions", func(r chi.Router) {
 			r.Post("/", permissionsCreate.Handler(log, storage))
 			r.Delete("/", permissionsDelete.Handler(log, storage))

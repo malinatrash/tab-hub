@@ -27,3 +27,13 @@ func (s *Storage) Project(ctx context.Context, id int) (*models.Project, error) 
 
 	return &project, nil
 }
+
+func (s *Storage) UpdateProjectState(ctx context.Context, project *models.Project) error {
+	query := `UPDATE projects SET state = $1, updated_at = NOW() WHERE id = $2`
+	_, err := s.db.ExecContext(ctx, query, project.State, project.ID)
+	if err != nil {
+		return fmt.Errorf("failed to update project with id %d: %w", project.ID, err)
+	}
+
+	return nil
+}
