@@ -4,13 +4,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/malinatrash/tabhub/internal/config"
-	permissionsCreate "github.com/malinatrash/tabhub/internal/http-server/handlers/permissions/create"
-	permissionsDelete "github.com/malinatrash/tabhub/internal/http-server/handlers/permissions/delete"
-	projectsCreate "github.com/malinatrash/tabhub/internal/http-server/handlers/projects/create"
-	projectsGet "github.com/malinatrash/tabhub/internal/http-server/handlers/projects/get"
-	usersCreate "github.com/malinatrash/tabhub/internal/http-server/handlers/users/create"
-	usersGet "github.com/malinatrash/tabhub/internal/http-server/handlers/users/get"
-	wsManager "github.com/malinatrash/tabhub/internal/http-server/web-sockets/connection-handler"
+	permissionsCreate "github.com/malinatrash/tabhub/internal/http_server/handlers/permissions/create"
+	permissionsDelete "github.com/malinatrash/tabhub/internal/http_server/handlers/permissions/delete"
+	projectsCreate "github.com/malinatrash/tabhub/internal/http_server/handlers/projects/create"
+	projectsGet "github.com/malinatrash/tabhub/internal/http_server/handlers/projects/get"
+	usersCreate "github.com/malinatrash/tabhub/internal/http_server/handlers/users/create"
+	usersGet "github.com/malinatrash/tabhub/internal/http_server/handlers/users/get"
+	wsManager "github.com/malinatrash/tabhub/internal/http_server/web_sockets/project"
 	"github.com/malinatrash/tabhub/internal/lib/logger"
 	"github.com/malinatrash/tabhub/internal/storage/postgres"
 	"github.com/malinatrash/tabhub/internal/storage/redis"
@@ -34,6 +34,7 @@ func main() {
 	redisClient, err := redis.New(cfg.Cache)
 	if err != nil {
 		log.Error("failed to initialize redisClient", err.Error())
+		os.Exit(1)
 	}
 	_ = redisClient
 
