@@ -23,8 +23,15 @@ func New(cfg config.Database) (*Storage, error) {
 
 	db, err := sqlx.Connect("postgres", url)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s, %s: %w", op, cfg, err)
 	}
 
 	return &Storage{db: db}, nil
+}
+
+func (s *Storage) Close() {
+	err := s.db.Close()
+	if err != nil {
+		return
+	}
 }

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+
 	"github.com/malinatrash/tabhub/internal/storage/models"
 )
 
@@ -36,4 +37,26 @@ func (s *Storage) UpdateProjectState(ctx context.Context, project *models.Projec
 	}
 
 	return nil
+}
+
+func (s *Storage) GetAllProjects(ctx context.Context) ([]models.Project, error) {
+	query := "SELECT id, name, owner_id, private, created_at, updated_at FROM projects WHERE 1=1"
+
+	rows, err := s.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projects []models.Project
+	for rows.Next() {
+		var p models.Project
+		if err := rows.Scan(&p.ID, &p.Name, &p.OwnerID, &p.Private, &p.CreatedAt, &p.UpdatedAt); err != nil {
+			return nil, err
+		}
+		p.State = ""
+		projects = append(projects, p)
+	}
+
+	return projects, nil
 }

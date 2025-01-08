@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"github.com/malinatrash/tabhub/internal/config"
 	"github.com/redis/go-redis/v9"
 )
@@ -11,8 +12,11 @@ type Client struct {
 }
 
 func New(cfg config.Cache) (*Client, error) {
+
+	addr := fmt.Sprintf("%s:%d", cfg.Address, cfg.Port)
+
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     cfg.Address,
+		Addr:     addr,
 		Username: cfg.Username,
 		Password: cfg.Password,
 		DB:       cfg.DB,
@@ -26,4 +30,11 @@ func New(cfg config.Cache) (*Client, error) {
 	}
 
 	return &Client{client: rdb}, nil
+}
+
+func (c *Client) Close() {
+	err := c.client.Close()
+	if err != nil {
+		return
+	}
 }

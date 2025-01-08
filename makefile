@@ -1,20 +1,7 @@
-# Makefile
-
-DOWN := go run cmd/goose/down/main.go
-UP := go run cmd/goose/up/main.go
-RUN := go run cmd/tabhub/main.go
-DROP := go run cmd/goose/drop/main.go
+UP := goose postgres "user=postgres password=postgres dbname=tabhub host=localhost port=5432 sslmode=disable" up -dir ./db/migrations
 
 .PHONY: all
-all: down up run
-
-.PHONY: drop
-drop:
-	$(DROP)
-
-.PHONY: down
-down:
-	$(DOWN)
+all: up run
 
 .PHONY: up
 up:
@@ -22,4 +9,4 @@ up:
 
 .PHONY: run
 run:
-	$(RUN)
+	go run cmd/tabhub/main.go

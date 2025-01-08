@@ -28,7 +28,7 @@ type projectWS struct {
 	mu        sync.Mutex
 }
 
-type CacheManager interface {
+type cacheManager interface {
 	PushProject(ctx context.Context, projectID int, state string) error
 	DeleteProject(ctx context.Context, projectID int) error
 }
